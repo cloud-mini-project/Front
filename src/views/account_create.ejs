@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계좌 생성</title>
+</head>
+<body>
+    <h1>계좌 생성</h1>
+    <form action="/create" method="POST">
+        <label for="account_type">계좌 유형:</label>
+        <input type="text" id="account_type" name="account_type" required>
+        <br>
+        <label for="account_number">계좌 번호:</label>
+        <input type="text" id="account_number" name="account_number" required>
+        <br>
+        <button type="submit">계좌 생성</button>
+    </form>
+</body>
+</html>

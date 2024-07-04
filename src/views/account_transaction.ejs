@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계좌 입출금</title>
+</head>
+<body>
+    <h1>계좌 입출금</h1>
+    <p>계좌 번호: <%= account.account_number %></p>
+    <p>잔고: <%= account.account_balance %></p>
+    <form action="/transaction" method="POST">
+        <input type="hidden" name="account_id" value="<%= account.id %>">
+        <label for="transaction_type">거래 유형:</label>
+        <select id="transaction_type" name="transaction_type" required>
+            <option value="deposit">입금</option>
+            <option value="withdrawal">출금</option>
+        </select>
+        <br>
+        <label for="amount">금액:</label>
+        <input type="number" id="amount" name="amount" required>
+        <br>
+        <button type="submit">거래</button>
+    </form>
+</body>
+</html>
