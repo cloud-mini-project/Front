@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accounts</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
@@ -20,85 +19,98 @@
         <section id="content">
             <h2>내 계좌</h2>
             <ul id="accountsList"></ul>
-            <input type="text" id="newAccountName" placeholder="계좌 이름">
+            <input type="text" id="newAccountType" placeholder="계좌 유형">
+            <input type="password" id="newAccountPassword" placeholder="계좌 비밀번호">
             <button id="addAccount">계좌 추가</button>
         </section>
     </main>
     <footer></footer>
     <script>
-        $(document).ready(function(){
-            // 계좌 목록 가져오기
+        $(document).ready(function() {
             function loadAccounts() {
-                $.get('/api/account/accounts', function(data){
+                $.get('/api/accounts', function(data) {
                     let accountsHtml = '';
-                    data.accounts.forEach(account => {
-                        accountsHtml += `<li>${account.account_name} - ${account.balance} 
-                            <button class="deleteAccount" data-id="${account.id}">삭제</button>
-                            <button class="deposit" data-id="${account.id}">입금</button>
-                            <button class="withdraw" data-id="${account.id}">출금</button>
-                        </li>`;
-                    });
+                    if (data.accounts && data.accounts.length > 0) {
+                        data.accounts.forEach(account => {
+                            accountsHtml += `
+                                <li>${account.account_number} - ${account.account_balance} 
+                                    <button class="deleteAccount" data-id="${account.id}">삭제</button>
+                                    <button class="deposit" data-id="${account.id}">입금</button>
+                                    <button class="withdraw" data-id="${account.id}">출금</button>
+                                </li>`;
+                        });
+                    } else {
+                        accountsHtml = '<li>계좌가 없습니다.</li>';
+                    }
                     $('#accountsList').html(accountsHtml);
+                }).fail(function() {
+                    alert('계좌 목록을 불러오는데 실패했습니다.');
                 });
             }
 
             loadAccounts();
 
-            // 계좌 추가하기
-            $('#addAccount').click(function(){
-                const accountName = $('#newAccountName').val();
-                $.post('/api/account/create', { account_name: accountName }, function(data){
+            $('#addAccount').click(function() {
+                const accountType = $('#newAccountType').val();
+                const accountPassword = $('#newAccountPassword').val();
+                $.post('/api/accounts/create', { account_type: accountType, account_password: accountPassword }, function(data) {
                     if (data.success) {
                         alert('계좌가 추가되었습니다.');
-                        loadAccounts(); // 계좌 목록 새로고침
+                        loadAccounts();
                     } else {
                         alert('계좌 추가 실패');
                     }
+                }).fail(function() {
+                    alert('계좌 추가 요청에 실패했습니다.');
                 });
             });
 
-            // 계좌 삭제하기
-            $(document).on('click', '.deleteAccount', function(){
+            $(document).on('click', '.deleteAccount', function() {
                 const accountId = $(this).data('id');
                 $.ajax({
-                    url: `/api/account/delete/${accountId}`,
+                    url: `/api/accounts/delete/${accountId}`,
                     type: 'DELETE',
-                    success: function(data){
+                    success: function(data) {
                         if (data.success) {
                             alert('계좌가 삭제되었습니다.');
                             loadAccounts();
                         } else {
                             alert('계좌 삭제 실패');
                         }
+                    },
+                    fail: function() {
+                        alert('계좌 삭제 요청에 실패했습니다.');
                     }
                 });
             });
 
-            // 입금하기
-            $(document).on('click', '.deposit', function(){
+            $(document).on('click', '.deposit', function() {
                 const accountId = $(this).data('id');
                 const amount = prompt('입금할 금액을 입력하세요:');
-                $.post('/api/account/deposit', { account_id: accountId, amount: amount }, function(data){
+                $.post('/api/accounts/deposit', { account_id: accountId, amount: amount }, function(data) {
                     if (data.success) {
                         alert('입금되었습니다.');
                         loadAccounts();
                     } else {
                         alert('입금 실패');
                     }
+                }).fail(function() {
+                    alert('입금 요청에 실패했습니다.');
                 });
             });
 
-            // 출금하기
-            $(document).on('click', '.withdraw', function(){
+            $(document).on('click', '.withdraw', function() {
                 const accountId = $(this).data('id');
                 const amount = prompt('출금할 금액을 입력하세요:');
-                $.post('/api/account/withdraw', { account_id: accountId, amount: amount }, function(data){
+                $.post('/api/accounts/withdraw', { account_id: accountId, amount: amount }, function(data) {
                     if (data.success) {
                         alert('출금되었습니다.');
                         loadAccounts();
                     } else {
                         alert('출금 실패');
                     }
+                }).fail(function() {
+                    alert('출금 요청에 실패했습니다.');
                 });
             });
         });

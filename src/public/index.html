@@ -17,29 +17,21 @@
     </header>
     <main>
         <section id="content">
-            <!-- Content will be loaded here -->
         </section>
     </main>
     <footer></footer>
     <script>
         $(document).ready(function(){
             $('#accounts').click(function(){
-                $.get('/api/account/accounts', function(data){
-                    let accountsHtml = '<h2>내 계좌</h2><ul>';
-                    data.accounts.forEach(account => {
-                        accountsHtml += `<li>${account.account_name} - ${account.balance}</li>`;
-                    });
-                    accountsHtml += '</ul>';
-                    $('#content').html(accountsHtml);
-                });
+                window.location.href = '/accounts'; // '/account' 페이지로 이동
             });
 
             $('#login').click(function(){
-                // Login logic
+                window.location.href = '/login'; // '/login' 페이지로 이동
             });
 
             $('#register').click(function(){
-                // Register logic
+                window.location.href = '/register'; // '/register' 페이지로 이동
             });
         });
     </script>
