@@ -1,9 +1,21 @@
 $(document).ready(function() {
     const userId = sessionStorage.getItem('userId');
-    $('#welcomeMessage').text(`${userId}님의 계좌 목록:`);
+    if (!userId) {
+        alert('로그인이 필요합니다.');
+        window.location.href = 'index.html';
+        return;
+    }
 
+    // 사용자 이름을 가져와서 표시
+    $.get(`http://127.0.0.1:8080/api/account/user?user_id=${userId}`, function(data) {
+        const userName = data.name;
+        $('#welcomeMessage').text(`${userName}님의 계좌 목록:`);
+    }).fail(function() {
+        alert('사용자 정보를 불러오는데 실패했습니다.');
+    });
+    
     function loadAccounts() {
-        $.get(`/api/accounts?user_id=${userId}`, function(data) {
+        $.get(`http://127.0.0.1:8080/api/account?user_id=${userId}`, function(data) {
             let accountsHtml = '';
             if (data.accounts && data.accounts.length > 0) {
                 data.accounts.forEach(account => {
@@ -11,7 +23,7 @@ $(document).ready(function() {
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             ${account.account_number} - ${account.account_balance}
                             <div>
-                                <button class=" btn btn-danger btn-sm deleteAccount" data-id="${account.id}">삭제</button>
+                                <button class="btn btn-danger btn-sm deleteAccount" data-id="${account.id}">삭제</button>
                                 <button class="btn btn-success btn-sm deposit" data-id="${account.id}">입금</button>
                                 <button class="btn btn-warning btn-sm withdraw" data-id="${account.id}">출금</button>
                             </div>
@@ -25,13 +37,14 @@ $(document).ready(function() {
             alert('계좌 목록을 불러오는데 실패했습니다.');
         });
     }
+    
 
     loadAccounts();
 
     $('#addAccount').click(function() {
         const accountType = $('#newAccountType').val();
         const accountPassword = $('#newAccountPassword').val();
-        $.post('/api/accounts/create', {
+        $.post('http://127.0.0.1:8080/api/account/create', {
             account_type: accountType,
             account_password: accountPassword,
             user_id: userId
@@ -50,7 +63,7 @@ $(document).ready(function() {
     $(document).on('click', '.deleteAccount', function() {
         const accountId = $(this).data('id');
         $.ajax({
-            url: `/api/accounts/delete/${accountId}`,
+            url: `http://127.0.0.1:8080/api/account/delete/${accountId}`,
             type: 'DELETE',
             data: { user_id: userId },
             success: function(data) {
@@ -70,7 +83,7 @@ $(document).ready(function() {
     $(document).on('click', '.deposit', function() {
         const accountId = $(this).data('id');
         const amount = prompt('입금할 금액을 입력하세요:');
-        $.post('/api/accounts/deposit', {
+        $.post('http://127.0.0.1:8080/api/account/deposit', {
             account_id: accountId,
             amount: amount,
             user_id: userId
@@ -89,7 +102,7 @@ $(document).ready(function() {
     $(document).on('click', '.withdraw', function() {
         const accountId = $(this).data('id');
         const amount = prompt('출금할 금액을 입력하세요:');
-        $.post('/api/accounts/withdraw', {
+        $.post('http://127.0.0.1:8080/api/account/withdraw', {
             account_id: accountId,
             amount: amount,
             user_id: userId
