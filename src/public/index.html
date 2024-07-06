@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <div id="head__menulist">
+            <button id="sprint" name="#">Sprint</button>
+            <button id="accounts" name="#">내 계좌</button>
+            <button id="login" name="#">LOGIN</button>
+            <button id="register" name="#">REGISTER</button>
+        </div>
+    </header>
+    <main>
+        <section id="content">
+            <!-- Content will be loaded here -->
+        </section>
+    </main>
+    <footer></footer>
+    <script>
+        $(document).ready(function(){
+            $('#accounts').click(function(){
+                $.get('/api/account/accounts', function(data){
+                    let accountsHtml = '<h2>내 계좌</h2><ul>';
+                    data.accounts.forEach(account => {
+                        accountsHtml += `<li>${account.account_name} - ${account.balance}</li>`;
+                    });
+                    accountsHtml += '</ul>';
+                    $('#content').html(accountsHtml);
+                });
+            });
+
+            $('#login').click(function(){
+                // Login logic
+            });
+
+            $('#register').click(function(){
+                // Register logic
+            });
+        });
+    </script>
+</body>
+</html>
