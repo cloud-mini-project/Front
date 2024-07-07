@@ -1,49 +1,44 @@
 const express = require('express');
 const app = express();
-const session = require('express-session');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const registerRouter = require('./router/register');
+
 require('dotenv').config();
 
 const HOST = process.env.SERVER_HOST
 const PORT = process.env.SERVER_PORT
 
-app.use(express.static('public'));
-
-app.use(
-    session({
-        secret: '암호화키',
-        resave: false,
-        saveUninitialized: false,
-    })
-);
-
-app.set('views', path.join(__dirname, 'public'));
+app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-app.use(cookieParser());
+// TODO : EJS로 변경 완료 시 제거
+app.use('/', express.static(path.join(__dirname, 'src')));
 
-async function Server_run() {
-    try {
-        // 라우터 설정
-        app.get('/', (req, res) => {
-            res.render('index');
-        });
-        
-        // 라우터 사용
-        app.use('/register', registerRouter);
+// 프록시 (서버 자원))
+app.use('/api', createProxyMiddleware({
+    target: `http://${HOST}:${8080}/api`,
+    changeOrigin: true
+}));
 
-        // 서버 시작
-        app.listen(PORT, () => {
-            console.log(`Server running at http://${HOST}:${PORT}`);
-        });
-    } catch (error) {
-        console.error('Server error:', error);
-    }
-}
+// 프록시 (서버 자원)
+app.use('/public/notice', createProxyMiddleware({
+    target: `http://${HOST}:${8080}/public/notice`,
+    changeOrigin: true
+}));
 
-Server_run();
+
+app.get('/', (req, res) => {
+    res.render('index');
+});
+
+app.get('/notice', (req, res) => {
+    res.render('notice');
+});
+
+app.get('/notice/:id', (req, res) => {
+    res.render('notice_detail', { id: req.params.id });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running at http://${HOST}:${PORT}`);
+});
