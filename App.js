@@ -1,49 +1,44 @@
 const express = require('express');
-const app = express();
-const session = require('express-session');
+
 const path = require('path');
 const bodyParser = require('body-parser');
+const session = require('express-session');
 const cookieParser = require('cookie-parser');
-const registerRouter = require('./router/register');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 require('dotenv').config();
 
-const HOST = process.env.SERVER_HOST
-const PORT = process.env.SERVER_PORT
+const app = express();
 
-app.use(express.static('public'));
+const HOST = process.env.SERVER_HOST || '127.0.0.1';
+const PORT = process.env.SERVER_PORT || 3000;
 
-app.use(
-    session({
-        secret: '암호화키',
-        resave: false,
-        saveUninitialized: false,
-    })
-);
-
-app.set('views', path.join(__dirname, 'public'));
-app.set('view engine', 'ejs');
-
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(session({
+    secret: '암호화키',
+    resave: false,
+    saveUninitialized: false,
+}));
 
-async function Server_run() {
-    try {
-        // 라우터 설정
-        app.get('/', (req, res) => {
-            res.render('index');
-        });
-        
-        // 라우터 사용
-        app.use('/register', registerRouter);
+// Static files middleware
+app.use(express.static(path.join(__dirname, 'src/public')));
+app.use('/assets', express.static(path.join(__dirname, 'src/assets')));
 
-        // 서버 시작
-        app.listen(PORT, () => {
-            console.log(`Server running at http://${HOST}:${PORT}`);
-        });
-    } catch (error) {
-        console.error('Server error:', error);
-    }
-}
+// Proxy setup to redirect API calls to backend
+app.use('/api', createProxyMiddleware({ target: 'http://127.0.0.1:8080', changeOrigin: true }));
+app.use('/auth', createProxyMiddleware({ target: 'http://127.0.0.1:8080', changeOrigin: true }));
 
-Server_run();
+// Routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'src/public', 'index.html'));
+});
+
+app.get('/accounts', (req, res) => {
+    res.sendFile(path.join(__dirname, 'src/public', 'accounts.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Front-end server running at http://${HOST}:${PORT}`);
+});
