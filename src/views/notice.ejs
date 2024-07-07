@@ -9,26 +9,9 @@
     <meta content="" name="description">
     <meta content="" name="keywords">
 
-    <!-- Favicons -->
-    <link href="/assets/img/favicon.png" rel="icon">
-    <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <%- include('include/head-link.html') %>
 
-    <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-        rel="stylesheet">
-
-    <!-- Vendor CSS Files -->
-    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-    <!-- Template Main CSS File -->
-    <link href="/assets/css/style.css" rel="stylesheet">
-
-    <!-- =======================================================
+        <!-- =======================================================
   * Template Name: Lumia
   * Template URL: https://bootstrapmade.com/lumia-bootstrap-business-template/
   * Updated: Mar 17 2024 with Bootstrap v5.3.3
@@ -36,218 +19,176 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 
-    <!-- <style>
+        <!-- <style>
     .outlined-table {
         outline: 2px solid gray; /* Outline properties */
         outline-offset: 5px;    /* Outline offset */
     }
     </style> -->
-    <style>
-        #image-input,
-        #file-input {
-            display: none;
-        }
+        <style>
+            #image-input,
+            #file-input {
+                display: none;
+            }
 
-        #image-preview,
-        #file-preview {
-            display: flex;
-            overflow-x: auto;
-            margin-top: 10px;
-        }
+            #image-preview,
+            #file-preview {
+                display: flex;
+                overflow-x: auto;
+                margin-top: 10px;
+            }
 
-        #image-preview img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            margin: 5px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+            #image-preview img {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                margin: 5px;
+                margin: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
 
-        #file-preview span {
-            display: inline-block;
-            padding: 5px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            white-space: nowrap;
-        }
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
+            #file-preview span {
+                display: inline-block;
+                padding: 5px;
+                margin: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                white-space: nowrap;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
 
-        $(window).on('load', function () {
+            $(window).on('load', function () {
 
-            // 공지사항 작성
-            $('#form-create-notice').submit(function (event) {
-                event.preventDefault();
+                // 공지사항 작성
+                $('#form-create-notice').submit(function (event) {
+                    event.preventDefault();
 
-                var formData = new FormData(this);
-                $.ajax({
-                    url: '/api/notice',
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (body) {
-                        console.log(body);
-                        alert('공지사항이 작성되었습니다.');
-                        loadNotice();
-                    },
+                    var formData = new FormData(this);
+                    $.ajax({
+                        url: '/api/notice',
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (body) {
+                            console.log(body);
+                            alert('공지사항이 작성되었습니다.');
+                            loadNotice();
+                        },
+                    });
                 });
-            });
 
-            let loadNotice = () => {
-                // 공지사항 불러오기
-                $.ajax({
-                    url: '/api/notice',
-                    type: 'GET',
-                    success: function (body) {
-                        console.log(body);
+                let loadNotice = () => {
+                    // 공지사항 불러오기
+                    $.ajax({
+                        url: '/api/notice',
+                        type: 'GET',
+                        success: function (body) {
+                            console.log(body);
 
-                        let data = body.data
-                        var table = $('#notice-table tbody');
-                        // for (var i = 0; i < data.length; i++) {
-                        //     var row = $('<tr>');
-                        //     row.append($('<th>').text(data[i].notice_id));
-                        //     row.append($('<td>').text(data[i].title));
-                        //     row.append($('<td>').text(data[i].created.substring(0, 10)));
-                        //     table.append(row);
-                        // }
+                            let data = body.data
+                            var table = $('#notice-table tbody');
+                            // for (var i = 0; i < data.length; i++) {
+                            //     var row = $('<tr>');
+                            //     row.append($('<th>').text(data[i].notice_id));
+                            //     row.append($('<td>').text(data[i].title));
+                            //     row.append($('<td>').text(data[i].created.substring(0, 10)));
+                            //     table.append(row);
+                            // }
 
-                        // 테이블 초기화
-                        table.html('');
-                        // 공지사항 테이블에 클릭하면 페이지 이동하도록 추가
-                        for (var i = 0; i < data.length; i++) {
-                            var row = $('<tr>');
-                            row.append($('<th>').text(data[i].notice_id));
-                            row.append($('<td>').html(`<a href="/notice/${data[i].notice_id}">${data[i].title}</a>`));
-                            row.append($('<td>').text(data[i].created.substring(0, 10)));
-                            table.append(row);
+                            // 테이블 초기화
+                            table.html('');
+                            // 공지사항 테이블에 클릭하면 페이지 이동하도록 추가
+                            for (var i = 0; i < data.length; i++) {
+                                var row = $('<tr>');
+                                row.append($('<th>').text(data[i].notice_id));
+                                row.append($('<td>').html(`<a href="/notice/${data[i].notice_id}">${data[i].title}</a>`));
+                                row.append($('<td>').text(data[i].created.substring(0, 10)));
+                                table.append(row);
+                            }
                         }
+                    });
+                }
+                loadNotice();
+
+
+                // 이미지 추가
+                $('#image-add-button').click(() => {
+                    $('#image-input').click();
+                });
+
+                // 이미지 미리보기
+                $('#image-input').change((event) => {
+                    const files = event.target.files;
+                    const preview = $('#image-preview');
+                    preview.html(''); // Clear previous previews
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+
+                        reader.onload = (e) => {
+                            const div = $('<div style="position: relative; display: inline-block;">');
+                            const img = $('<img>');
+                            img.attr('src', e.target.result);
+                            // 이미지 우측 상단에 빨간색 제거 버튼
+                            const button = $('<button class="btn btn-danger btn-sm" style="position: absolute; right: 0; top: 0;">');
+                            button.text('삭제');
+                            button.click(() => {
+                                div.remove();
+                            });
+                            div.append(img);
+                            div.append(button);
+                            preview.append(div);
+                        };
+
+                        reader.readAsDataURL(file);
                     }
                 });
-            }
-            loadNotice();
 
+                // 파일 추가
+                $('#file-add-button').click(() => {
+                    $('#file-input').click();
+                });
 
-            // 이미지 추가
-            $('#image-add-button').click(() => {
-                $('#image-input').click();
+                // 파일 미리보기
+                $('#file-input').change((event) => {
+                    const files = event.target.files;
+                    const preview = $('#file-preview');
+                    preview.html(''); // Clear previous previews
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+
+                        reader.onload = (e) => {
+                            // span 태그로 파일명 표시 (제거 버튼 포함)
+                            const span = $('<span>');
+                            span.text(file.name);
+                            // 빨간색 제거 버튼
+                            const button = $('<button class="btn btn-danger btn-sm" style="margin-left: 10px;" >');
+                            button.text('삭제');
+                            button.click(() => {
+                                span.remove();
+                            });
+                            span.append(button);
+                            preview.append(span);
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+                });
             });
-
-            // 이미지 미리보기
-            $('#image-input').change((event) => {
-                const files = event.target.files;
-                const preview = $('#image-preview');
-                preview.html(''); // Clear previous previews
-
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const reader = new FileReader();
-
-                    reader.onload = (e) => {
-                        const div = $('<div style="position: relative; display: inline-block;">');
-                        const img = $('<img>');
-                        img.attr('src', e.target.result);
-                        // 이미지 우측 상단에 빨간색 제거 버튼
-                        const button = $('<button class="btn btn-danger btn-sm" style="position: absolute; right: 0; top: 0;">');
-                        button.text('삭제');
-                        button.click(() => {
-                            div.remove();
-                        });
-                        div.append(img);
-                        div.append(button);
-                        preview.append(div);
-                    };
-
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // 파일 추가
-            $('#file-add-button').click(() => {
-                $('#file-input').click();
-            });
-
-            // 파일 미리보기
-            $('#file-input').change((event) => {
-                const files = event.target.files;
-                const preview = $('#file-preview');
-                preview.html(''); // Clear previous previews
-
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const reader = new FileReader();
-
-                    reader.onload = (e) => {
-                        // span 태그로 파일명 표시 (제거 버튼 포함)
-                        const span = $('<span>');
-                        span.text(file.name);
-                        // 빨간색 제거 버튼
-                        const button = $('<button class="btn btn-danger btn-sm" style="margin-left: 10px;" >');
-                        button.text('삭제');
-                        button.click(() => {
-                            span.remove();
-                        });
-                        span.append(button);
-                        preview.append(span);
-                    };
-
-                    reader.readAsDataURL(file);
-                }
-            });
-        });
-    </script>
+        </script>
 </head>
 
 <body>
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top d-flex align-items-center">
-        <div class="container d-flex align-items-center">
-
-            <div class="logo me-auto">
-                <h1><a href="/">SEVEN BANK</a></h1>
-                <!-- Uncomment below if you prefer to use an image logo -->
-                <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
-            </div>
-
-            <nav id="navbar" class="navbar order-last order-lg-0">
-
-                <span id="loginSpan">
-                    <!-- 경로 수정 -->
-                    <form action="/auth/login" method="post">
-                        <!-- name 변경! -->
-                        ID <input size="8" name="auth_id">
-                        PW <input size="8" name="password">
-                        <input type="submit" value="login" class="btn btn-outline-info">
-                    </form>
-                </span>
-
-                <ul>
-                    <li><a class="nav-link scrollto active" href="index.html">홈</a></li>
-                    <li><a class="nav-link scrollto" href="#about">회원가입</a></li>
-                    <li><a class="nav-link scrollto" href="#about">마이페이지</a></li>
-                    <li><a class="nav-link scrollto" href="#services">내 계좌</a></li>
-                    <li><a class="nav-link scrollto " href="#portfolio">송금</a></li>
-                    <li class="dropdown"><a href="#"><span>게시판</span> <i class="bi bi-chevron-down"></i></a>
-                        <ul>
-                            <li><a href="/notice">공지사항</a></li>
-                            <li><a href="#">QnA</a></li>
-                        </ul>
-                </ul>
-                <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-
-            <div class="header-social-links d-flex align-items-center">
-                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-                <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
-            </div>
-
-        </div>
+        <%- include('include/nav.html') %>
     </header><!-- End Header -->
 
 
@@ -401,17 +342,7 @@
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Vendor JS Files -->
-    <script src="/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-    <script src="/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="/assets/vendor/waypoints/noframework.waypoints.js"></script>
-    <script src="/assets/vendor/php-email-form/validate.js"></script>
-
-    <!-- Template Main JS File -->
-    <script src="/assets/js/main.js"></script>
+    <%- include('include/body-js.html') %>
 
 </body>
 

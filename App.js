@@ -5,24 +5,27 @@ const path = require('path');
 
 require('dotenv').config();
 
-const HOST = process.env.SERVER_HOST
-const PORT = process.env.SERVER_PORT
+
 
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
 
-// TODO : EJS로 변경 완료 시 제거
 app.use('/', express.static(path.join(__dirname, 'src')));
 
-// 프록시 (서버 자원))
+const HOST = process.env.SERVER_HOST | '127.0.0.1'
+const PORT = process.env.SERVER_PORT | '8081'
+
+const PROXY_HOST = process.env.PROXY_HOST | '127.0.0.1'
+const PROXY_PORT = process.env.PROXY_PORT | '8080'
+
 app.use('/api', createProxyMiddleware({
-    target: `http://${HOST}:${8080}/api`,
+    target: `http://${PROXY_HOST}:${PROXY_PORT}/api`,
     changeOrigin: true
 }));
 
 // 프록시 (서버 자원)
 app.use('/public/notice', createProxyMiddleware({
-    target: `http://${HOST}:${8080}/public/notice`,
+    target: `http://${PROXY_HOST}:${PROXY_PORT}/public/notice`,
     changeOrigin: true
 }));
 

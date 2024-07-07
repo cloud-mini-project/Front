@@ -9,26 +9,9 @@
     <meta content="" name="description">
     <meta content="" name="keywords">
 
-    <!-- Favicons -->
-    <link href="/assets/img/favicon.png" rel="icon">
-    <link href="/assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+    <%- include('include/head-link.html') %>
 
-    <!-- Google Fonts -->
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Raleway:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-        rel="stylesheet">
-
-    <!-- Vendor CSS Files -->
-    <link href="/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-    <link href="/assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="/assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-    <link href="/assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-
-    <!-- Template Main CSS File -->
-    <link href="/assets/css/style.css" rel="stylesheet">
-
-    <!-- =======================================================
+        <!-- =======================================================
   * Template Name: Lumia
   * Template URL: https://bootstrapmade.com/lumia-bootstrap-business-template/
   * Updated: Mar 17 2024 with Bootstrap v5.3.3
@@ -36,147 +19,105 @@
   * License: https://bootstrapmade.com/license/
   ======================================================== -->
 
-    <!-- <style>
+        <!-- <style>
     .outlined-table {
         outline: 2px solid gray; /* Outline properties */
         outline-offset: 5px;    /* Outline offset */
     }
     </style> -->
-    <style>
-        #imgs,
-        #files {
-            display: flex;
-            overflow-x: auto;
-            margin-top: 10px;
-        }
+        <style>
+            #imgs,
+            #files {
+                display: flex;
+                overflow-x: auto;
+                margin-top: 10px;
+            }
 
-        #imgs img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            margin: 5px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+            #imgs img {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                margin: 5px;
+                margin: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
 
-        #files span {
-            display: inline-block;
-            padding: 5px;
-            margin: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            white-space: nowrap;
-        }
-    </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script>
+            #files span {
+                display: inline-block;
+                padding: 5px;
+                margin: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                white-space: nowrap;
+            }
+        </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
 
-        $(window).on('load', function () {
-            // 공지사항 불러오기
-            $.ajax({
-                url: '/api/notice/<%= id %>',
-                type: 'GET',
-                success: function (body) {
-                    console.log(body);
-                    const data = body.data;
-                    /*
-                        {
-                            "status": "success",
-                            "message": "공지사항 상세 조회 성공",
-                            "data": {
-                                "user_id": 0,
-                                "notice_id": 22,
-                                "name": "test",
-                                "email": "test",
-                                "role": "test",
-                                "title": "zzz",
-                                "content": "zzz",
-                                "created": "2024-07-06T22:58:56.000Z",
-                                "file": "public/notice/e5177fa1-b5d6-42a0-81f8-d4439e6249c0",
-                                "img": "public/notice/e5177fa1-b5d6-42a0-81f8-d4439e6249c0"
+            $(window).on('load', function () {
+                // 공지사항 불러오기
+                $.ajax({
+                    url: '/api/notice/<%= id %>',
+                    type: 'GET',
+                    success: function (body) {
+                        console.log(body);
+                        const data = body.data;
+                        /*
+                            {
+                                "status": "success",
+                                "message": "공지사항 상세 조회 성공",
+                                "data": {
+                                    "user_id": 0,
+                                    "notice_id": 22,
+                                    "name": "test",
+                                    "email": "test",
+                                    "role": "test",
+                                    "title": "zzz",
+                                    "content": "zzz",
+                                    "created": "2024-07-06T22:58:56.000Z",
+                                    "file": "public/notice/e5177fa1-b5d6-42a0-81f8-d4439e6249c0",
+                                    "img": "public/notice/e5177fa1-b5d6-42a0-81f8-d4439e6249c0"
+                                }
                             }
+                        */
+
+
+                        // 제목
+                        $('#notice-title').text(data.title);
+                        // 내용
+                        $('#notice-content').text(data.content);
+                        // 작성자
+                        $('#notice-author').text('작성자: ' + data.name);
+                        // 작성일
+                        $('#notice-created').text('작성일: ' + data.created);
+
+                        if (data.img) {
+                            let imageFiles = data.imgFiles;
+                            imageFiles.forEach((file) => {
+                                $('#imgs').append(`<img src="/${file}" alt="${file}" class="img-thumbnail" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="$('#image-modal').attr('src', '/${file}');">`);
+                            });
                         }
-                    */
 
+                        // 첨부 파일 (한 줄로 클릭 시 다운로드, 표시는 경로 제외하고 파일명만)
+                        if (data.file) {
+                            let files = data.files;
+                            files.forEach((file) => {
+                                let fileName = file.split('/').pop();
+                                $('#files').append(`<span><a href="/${file}" download>${fileName}</a></span>`);
+                            });
+                        }
 
-                    // 제목
-                    $('#notice-title').text(data.title);
-                    // 내용
-                    $('#notice-content').text(data.content);
-                    // 작성자
-                    $('#notice-author').text('작성자: ' + data.name);
-                    // 작성일
-                    $('#notice-created').text('작성일: ' + data.created);
-
-                    if (data.img) {
-                        let imageFiles = data.imgFiles;
-                        imageFiles.forEach((file) => {
-                            $('#imgs').append(`<img src="/${file}" alt="${file}" class="img-thumbnail" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="$('#image-modal').attr('src', '/${file}');">`);
-                        });
                     }
-
-                    // 첨부 파일 (한 줄로 클릭 시 다운로드, 표시는 경로 제외하고 파일명만)
-                    if (data.file) {
-                        let files = data.files;
-                        files.forEach((file) => {
-                            let fileName = file.split('/').pop();
-                            $('#files').append(`<span><a href="/${file}" download>${fileName}</a></span>`);
-                        });
-                    }
-
-                }
+                });
             });
-        });
-    </script>
+        </script>
 </head>
 
 <body>
     <!-- ======= Header ======= -->
     <header id="header" class="fixed-top d-flex align-items-center">
-        <div class="container d-flex align-items-center">
-
-            <div class="logo me-auto">
-                <h1><a href="/">SEVEN BANK</a></h1>
-                <!-- Uncomment below if you prefer to use an image logo -->
-                <!-- <a href="index.html"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
-            </div>
-
-            <nav id="navbar" class="navbar order-last order-lg-0">
-
-                <span id="loginSpan">
-                    <!-- 경로 수정 -->
-                    <form action="/auth/login" method="post">
-                        <!-- name 변경! -->
-                        ID <input size="8" name="auth_id">
-                        PW <input size="8" name="password">
-                        <input type="submit" value="login" class="btn btn-outline-info">
-                    </form>
-                </span>
-
-                <ul>
-                    <li><a class="nav-link scrollto active" href="index.html">홈</a></li>
-                    <li><a class="nav-link scrollto" href="#about">회원가입</a></li>
-                    <li><a class="nav-link scrollto" href="#about">마이페이지</a></li>
-                    <li><a class="nav-link scrollto" href="#services">내 계좌</a></li>
-                    <li><a class="nav-link scrollto " href="#portfolio">송금</a></li>
-                    <li class="dropdown"><a href="#"><span>게시판</span> <i class="bi bi-chevron-down"></i></a>
-                        <ul>
-                            <li><a href="/notice">공지사항</a></li>
-                            <li><a href="#">QnA</a></li>
-                        </ul>
-                </ul>
-                <i class="bi bi-list mobile-nav-toggle"></i>
-            </nav><!-- .navbar -->
-
-            <div class="header-social-links d-flex align-items-center">
-                <a href="#" class="twitter"><i class="bi bi-twitter"></i></a>
-                <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
-                <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
-                <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></i></a>
-            </div>
-
-        </div>
+        <%- include('include/nav.html') %>
     </header><!-- End Header -->
 
 
@@ -361,17 +302,7 @@
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
-    <!-- Vendor JS Files -->
-    <script src="/assets/vendor/purecounter/purecounter_vanilla.js"></script>
-    <script src="/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="/assets/vendor/glightbox/js/glightbox.min.js"></script>
-    <script src="/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-    <script src="/assets/vendor/swiper/swiper-bundle.min.js"></script>
-    <script src="/assets/vendor/waypoints/noframework.waypoints.js"></script>
-    <script src="/assets/vendor/php-email-form/validate.js"></script>
-
-    <!-- Template Main JS File -->
-    <script src="/assets/js/main.js"></script>
+    <%- include('include/body-js.html') %>
 
 </body>
 
