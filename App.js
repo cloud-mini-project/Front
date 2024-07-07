@@ -1,9 +1,10 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
 
-require('dotenv').config();
 
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
