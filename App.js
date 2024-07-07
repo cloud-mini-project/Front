@@ -1,49 +1,41 @@
 const express = require('express');
 const app = express();
 const session = require('express-session');
-const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const registerRouter = require('./router/register');
+const path = require('path');
 require('dotenv').config();
-
-const HOST = process.env.SERVER_HOST
-const PORT = process.env.SERVER_PORT
-
-app.use(express.static('public'));
-
-app.use(
-    session({
-        secret: '암호화키',
-        resave: false,
-        saveUninitialized: false,
-    })
-);
-
-app.set('views', path.join(__dirname, 'public'));
-app.set('view engine', 'ejs');
+const accountRouter = require('./router/account'); // 이 부분이 중요합니다.
+const noticeRouter = require('./router/notice');
+const qnaRouter = require('./router/qna');
+const DB_connect = require('./DB');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-async function Server_run() {
-    try {
-        // 라우터 설정
-        app.get('/', (req, res) => {
-            res.render('index');
-        });
-        
-        // 라우터 사용
-        app.use('/register', registerRouter);
+app.use(session({
+    secret: '암호화키',
+    resave: false,
+    saveUninitialized: false,
+}));
 
-        // 서버 시작
-        app.listen(PORT, () => {
-            console.log(`Server running at http://${HOST}:${PORT}`);
-        });
-    } catch (error) {
-        console.error('Server error:', error);
-    }
-}
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(express.static(path.join(__dirname, '../Front/public')));
 
-Server_run();
+const HOST = process.env.SERVER_HOST;
+const PORT = process.env.SERVER_PORT;
+
+app.use('/api/accounts', accountRouter);
+app.use('/api/notice', noticeRouter);
+app.use('/api/qna', qnaRouter);
+
+DB_connect()
+  .then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running at http://${HOST}:${PORT}`);
+    });
+    }).catch((err) => {
+    console.error('DB connection failed:', err);
+});
