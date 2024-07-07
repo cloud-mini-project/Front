@@ -16,7 +16,7 @@
     <%- include('include/head-link.html') %>
     <div class="container mt-5">
         <h2>회원가입</h2>
-        <form action="auth/register" method="POST" id="registerForm">
+        <form action="/api/auth/register/save" method="POST" id="registerForm">
             <div class="form-group">
                 <label for="email">이메일:</label>
                 <input type="email" class="form-control" id="email" name="email" required>
@@ -81,11 +81,10 @@
             if (!email.includes('@')) {
                 errors.email = '올바른 이메일 형식이 아닙니다.';
             }
+
             if (name.length < 3) {
                 errors.name = '이름은 최소 3자 이상이어야 합니다.';
             }
-
-
  
             if (Object.keys(errors).length > 0) {
                 event.preventDefault(); // 폼 제출 막기
