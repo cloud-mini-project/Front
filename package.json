@@ -1,7 +1,7 @@
 {
     "name": "front-repo",
     "version": "1.0.0",
-    "main": "App.js",
+    "main": "app.js",
     "description": "A sample package.json",
     "dependencies": {
         "@faker-js/faker": "^8.4.1",
@@ -26,6 +26,7 @@
         "nodemon": "^3.1.4"
     },
     "scripts": {
-        "start": "node app.js"
+        "start": "node app.js",
+        "dev": "nodemon app.js"
     }
 }
