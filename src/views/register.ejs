@@ -5,34 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>회원가입</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
+    <%- include('include/head-link.html') %>
     <div class="container mt-5">
         <h2>회원가입</h2>
-        <form action="/register/save" method="post">
+        <form action="/auth/register" method="POST" id="registerForm">
             <div class="form-group">
                 <label for="email">이메일:</label>
                 <input type="email" class="form-control" id="email" name="email" required>
+                <% if (typeof errors !== 'undefined' && errors.email) { %>
+                    <span class="error-message"><%= errors.email %></span>
+                <% } %>
             </div>
             <div class="form-group">
                 <label for="name">이름:</label>
                 <input type="text" class="form-control" id="name" name="name" required>
+                <% if (typeof errors !== 'undefined' && errors.name) { %>
+                    <span class="error-message"><%= errors.name %></span>
+                <% } %>
             </div>
             <div class="form-group">
                 <label for="password">비밀번호:</label>
                 <input type="password" class="form-control" id="password" name="password" required>
+                <% if (typeof errors !== 'undefined' && errors.password) { %>
+                    <span class="error-message"><%= errors.password %></span>
+                <% } %>
             </div>
             <div class="form-group">
                 <label for="role">역할:</label>
                 <input type="text" class="form-control" id="role" name="role" placeholder="user" required>
+                <% if (typeof errors !== 'undefined' && errors.role) { %>
+                    <span class="error-message"><%= errors.role %></span>
+                <% } %>
             </div>
             <div class="form-group">
                 <label for="phone_num">전화번호:</label>
                 <input type="text" class="form-control" id="phone_num" name="phone_num" required>
+                <% if (typeof errors !== 'undefined' && errors.phone_num) { %>
+                    <span class="error-message"><%= errors.phone_num %></span>
+                <% } %>
             </div>
             <div class="form-group">
                 <label for="address">주소:</label>
                 <input type="text" class="form-control" id="address" name="address" required>
+                <% if (typeof errors !== 'undefined' && errors.address) { %>
+                    <span class="error-message"><%= errors.address %></span>
+                <% } %>
             </div>
             <button type="submit" class="btn btn-primary">회원가입</button>
         </form>
@@ -42,5 +67,44 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- 클라이언트 사이드 유효성 검사 -->
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            const email = document.getElementById('email').value;
+            const name = document.getElementById('name').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const phone_num = document.getElementById('phone_num').value;
+            const address = document.getElementById('address').value;
+            
+            // 각 필드의 유효성을 검사하는 예시 (프론트엔드에서의 간단한 검증)
+            const errors = {};
+            if (!email.includes('@')) {
+                errors.email = '올바른 이메일 형식이 아닙니다.';
+            }
+            if (name.length < 3) {
+                errors.name = '이름은 최소 3자 이상이어야 합니다.';
+            }
+            // 비밀번호, 전화번호, 주소 등에 대해서도 유효성 검사를 추가할 수 있습니다.
+
+            // 오류가 있을 경우 폼 제출을 막고 오류 메시지를 화면에 표시
+            if (Object.keys(errors).length > 0) {
+                event.preventDefault(); // 폼 제출 막기
+                displayErrors(errors);
+            }
+        });
+
+        // 오류 메시지를 화면에 표시하는 함수
+        function displayErrors(errors) {
+            Object.keys(errors).forEach(key => {
+                const errorSpan = document.getElementById('error-' + key);
+                if (errorSpan) {
+                    errorSpan.innerText = errors[key];
+                }
+            });
+        }
+    </script>
+    <%- include('include/body-js.html') %>
 </body>
 </html>
