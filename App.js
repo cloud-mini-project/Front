@@ -45,6 +45,10 @@ app.get('/notice/:id', (req, res) => {
     res.render('notice_detail', { id: req.params.id });
 });
 
+app.get(`/register`, (req, res) => {
+    res.render('register');
+});
+
 app.listen(PORT, () => {
     console.log(`Server running at http://${HOST}:${PORT}`);
 });
