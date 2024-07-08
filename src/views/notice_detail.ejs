@@ -26,6 +26,11 @@
     }
     </style> -->
         <style>
+            #image-input,
+            #file-input {
+                display: none;
+            }
+
             #imgs,
             #files {
                 display: flex;
@@ -51,11 +56,65 @@
                 border-radius: 5px;
                 white-space: nowrap;
             }
+
+            #image-preview,
+            #file-preview {
+                display: flex;
+                overflow-x: auto;
+                margin-top: 10px;
+            }
+
+            #image-preview img {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                margin: 5px;
+                margin: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+            #file-preview span {
+                display: inline-block;
+                padding: 5px;
+                margin: 5px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                white-space: nowrap;
+            }
         </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <script>
 
+
             $(window).on('load', function () {
+                $('#form-edit-notice').submit(function (event) {
+                    event.preventDefault();
+
+                    // APPLICTION/JSON 형식으로 데이터 전송
+                    const formData = new FormData(this);
+                    const data = {};
+                    formData.forEach((value, key) => {
+                        data[key] = value;
+                    });
+
+                    $.ajax({
+                        url: '/api/notice/<%= id %>',
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function (body) {
+                            console.log(body);
+                            alert('수정되었습니다.');
+                            location.reload();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error(error);
+                            alert('수정에 실패했습니다.');
+                        }
+                    });
+                });
+
                 // 공지사항 불러오기
                 $.ajax({
                     url: '/api/notice/<%= id %>',
@@ -63,25 +122,6 @@
                     success: function (body) {
                         console.log(body);
                         const data = body.data;
-                        /*
-                            {
-                                "status": "success",
-                                "message": "공지사항 상세 조회 성공",
-                                "data": {
-                                    "user_id": 0,
-                                    "notice_id": 22,
-                                    "name": "test",
-                                    "email": "test",
-                                    "role": "test",
-                                    "title": "zzz",
-                                    "content": "zzz",
-                                    "created": "2024-07-06T22:58:56.000Z",
-                                    "file": "public/notice/e5177fa1-b5d6-42a0-81f8-d4439e6249c0",
-                                    "img": "public/notice/e5177fa1-b5d6-42a0-81f8-d4439e6249c0"
-                                }
-                            }
-                        */
-
 
                         // 제목
                         $('#notice-title').text(data.title);
@@ -92,11 +132,28 @@
                         // 작성일
                         $('#notice-created').text('작성일: ' + data.created);
 
+                        // 수정 모달
+                        $('#noticeTitle').val(data.title);
+                        $('#noticeContent').val(data.content);
+
                         if (data.img) {
                             let imageFiles = data.imgFiles;
                             imageFiles.forEach((file) => {
                                 $('#imgs').append(`<img src="/${file}" alt="${file}" class="img-thumbnail" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="$('#image-modal').attr('src', '/${file}');">`);
+
+                                // 수정 모달
+                                addImagePreview(`/${file}`);
+
+                                // input 태그 파일 추가
+                                const imageInput = $('#image-input');
+                                const files = imageInput.prop('files');
+                                const newFiles = new FileList([...files, new File([file], file.name, {
+                                    type: 'image/*'
+                                })], '');
+                                imageInput.prop('files', newFiles);
                             });
+
+
                         }
 
                         // 첨부 파일 (한 줄로 클릭 시 다운로드, 표시는 경로 제외하고 파일명만)
@@ -105,11 +162,125 @@
                             files.forEach((file) => {
                                 let fileName = file.split('/').pop();
                                 $('#files').append(`<span><a href="/${file}" download>${fileName}</a></span>`);
+
+                                // 수정 모달
+                                addFilePreview(fileName);
                             });
                         }
 
                     }
                 });
+
+                // 이미지 추가
+                $('#image-add-button').click(() => {
+                    $('#image-input').click();
+                });
+
+                // 이미지 미리보기
+                const imagePreview = $('#image-preview');
+                const imageInput = $('#image-input');
+                imageInput.change((event) => {
+                    const files = event.target.files;
+
+                    imagePreview.html(''); // Clear previous previews
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+
+                        reader.onload = (e) => {
+                            addImagePreview(e.target.result);
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                const addImagePreview = (src) => {
+                    const div = $('<div style="position: relative; display: inline-block;">');
+                    const img = $('<img>');
+                    img.attr('src', src);
+                    // 이미지 우측 상단에 빨간색 제거 버튼
+                    const button = $('<button class="btn btn-danger btn-sm" style="position: absolute; right: 0; top: 0;">');
+                    button.text('삭제');
+                    button.click(() => {
+                        div.remove();
+                        // imageInput에서 제거
+                        const src = img.attr('src');
+                        const files = imageInput.prop('files');
+                        const newFiles = Array.from(files).filter((file) => {
+                            return URL.createObjectURL(file) !== src;
+                        });
+                        imageInput.prop('files', new FileList(newFiles, ''));
+
+                    });
+                    div.append(img);
+                    div.append(button);
+                    imagePreview.append(div);
+                }
+
+                $('#file-add-button').click(() => {
+                    $('#file-input').click();
+                });
+
+                // 파일 미리보기
+                const filePreview = $('#file-preview');
+                const fileInput = $('#file-input')
+                fileInput.change((event) => {
+                    const files = event.target.files;
+                    filePreview.html(''); // Clear previous previews
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+
+                        reader.onload = (e) => {
+                            addFilePreview(file.name);
+                        };
+
+                        reader.readAsDataURL(file);
+                    }
+                });
+
+                const addFilePreview = (name) => {
+                    // span 태그로 파일명 표시 (제거 버튼 포함)
+                    const span = $('<span>');
+                    span.text(name);
+                    // 빨간색 제거 버튼
+                    const button = $('<button class="btn btn-danger btn-sm" style="margin-left: 10px;" >');
+                    button.text('삭제');
+                    button.click(() => {
+                        span.remove();
+                        // fileInput에서 제거
+                        const files = fileInput.prop('files');
+                        const newFiles = Array.from(files).filter((file) => {
+                            return file.name !== name;
+                        });
+                        fileInput.prop('files', new FileList(newFiles, ''));
+                    });
+                    span.append(button);
+                    filePreview.append(span);
+                }
+
+                // 삭제 버튼
+                $('#btn-delete').click(() => {
+                    if (confirm('정말 삭제하시겠습니까?')) {
+                        $.ajax({
+                            url: '/api/notice/<%= id %>',
+                            type: 'DELETE',
+                            success: function (body) {
+                                console.log(body);
+                                alert('삭제되었습니다.');
+                                location.href = '/notice';
+                            },
+                            error: function (xhr, status, error) {
+                                console.error(error);
+                                alert('삭제에 실패했습니다.');
+                            }
+                        });
+                    }
+                });
+
             });
         </script>
 </head>
@@ -155,12 +326,15 @@
                 </div>
             </div>
 
-            <!-- 작성 버튼 (배치 오른쪽) -->
-            <button type="button" class="btn btn-outline-primary mt-5" style="float: right;" data-bs-toggle="modal"
-                data-bs-target="#noticeModal">작성</button>
-        </div>
-        </div>
+            <div class="d-flex justify-content-end">
+                <button type="button" class="btn btn-outline-primary mt-5" data-bs-toggle="modal"
+                    data-bs-target="#noticeModal">수정</button>
 
+                <button id="btn-delete" type="button" class="btn btn-outline-danger mt-5 ms-2">삭제</button>
+            </div>
+
+
+        </div>
 
     </main><!-- End #main -->
 
@@ -253,7 +427,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body text-start">
-                    <form method="post" action="/api/notice" enctype="multipart/form-data">
+                    <form id="form-edit-notice" accept-charset="UTF-8">
                         <div class="mb-3">
                             <label for="noticeTitle" class="col-form-label">제목:</label>
                             <input type="text" class="form-control" id="noticeTitle" name="title">
@@ -264,12 +438,12 @@
                             <textarea class="form-control" id="noticeContent" name="content" rows="5"></textarea>
                         </div>
                         <div class="mb-3">
-                            <input type="file" id="image-input" accept="image/*" name="imgs" multiple>
+                            <!-- <input type="file" id="image-input" accept="image/*" name="imgs" multiple> -->
                             <button type="button" id="image-add-button" class="btn btn-primary">이미지 추가</button>
                             <div id="image-preview"></div>
                         </div>
                         <div class="mb-3">
-                            <input type="file" id="file-input" name="files" multiple>
+                            <!-- <input type="file" id="file-input" name="files" multiple> -->
                             <button type="button" id="file-add-button" class="btn btn-primary">파일 추가</button>
                             <div id="file-preview"></div>
                         </div>
