@@ -49,3 +49,7 @@ app.get('/notice/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running at http://${HOST}:${PORT}`);
 });
+
+app.get('/qna', (req, res) => {
+    res.render('qna');
+});
