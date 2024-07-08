@@ -22,7 +22,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
                 alert('로그인 성공!');
                 console.log('User data:', result.user);
                 sessionStorage.setItem('userId', result.user.id); // user_id를 sessionStorage에 저장
-                window.location.href = '/accounts';
             } else {
                 alert('로그인 실패: ' + result.message);
             }

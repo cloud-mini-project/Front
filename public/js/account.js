@@ -38,10 +38,6 @@ $(document).ready(function () {
             alert('계좌 목록을 불러오는데 실패했습니다.');
         });
     }
-<<<<<<<< HEAD:public/js/account.js
-
-========
->>>>>>>> yoonhs:src/public/js/account.js
 
     loadAccounts();
 

@@ -14,13 +14,99 @@
             font-size: 0.9rem;
         }
     </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+        $(window).on('load', function () {
+            $('#registerForm').submit(function (e) {
+                e.preventDefault();
+                console.log('submit');
+                var email = $('#email').val();
+                var name = $('#name').val();
+                var password = $('#password').val();
+                var password2 = $('#password2').val();
+                var phone_num = $('#phone_num').val();
+                var address = $('#address').val();
+
+                var error = false;
+
+                if (email == '') {
+                    $('#error-email').text('이메일을 입력해주세요.');
+                    error = true;
+                } else {
+                    $('#error-email').text('');
+                }
+
+                if (name == '') {
+                    $('#error-name').text('이름을 입력해주세요.');
+                    error = true;
+                } else {
+                    $('#error-name').text('');
+                }
+
+                if (password == '') {
+                    $('#error-password').text('비밀번호를 입력해주세요.');
+                    error = true;
+                } else {
+                    $('#error-password').text('');
+                }
+
+
+                if (password != password2) {
+                    $('#error-password2').text('비밀번호가 일치하지 않습니다.');
+                    error = true;
+                } else {
+                    $('#error-password2').text('');
+                }
+
+                if (phone_num == '') {
+                    $('#error-phone_num').text('전화번호를 입력해주세요.');
+                    error = true;
+                } else {
+                    $('#error-phone_num').text('');
+                }
+
+                if (address == '') {
+                    $('#error-address').text('주소를 입력해주세요.');
+                    error = true;
+                } else {
+                    $('#error-address').text('');
+                }
+
+                if (error) {
+                    console.log('error')
+                    return;
+                }
+
+                $.ajax({
+                    url: '/api/auth/register/save',
+                    type: 'POST',
+                    data: {
+                        email: email,
+                        name: name,
+                        password: password,
+                        phone_num: phone_num,
+                        address: address
+                    },
+                    success: function (response) {
+                        console.log(response)
+                        alert('회원가입이 완료되었습니다.');
+                        window.location.href = '/';
+                    },
+                    error: function (response) {
+                        console.log(response)
+                        alert('회원가입에 실패했습니다.');
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 
 <body>
     <%- include('include/head-link.html') %>
         <div class="container mt-5">
             <h2>회원가입</h2>
-            <form action="/api/auth/register/save" method="POST" id="registerForm">
+            <form id="registerForm">
                 <div class="form-group">
                     <label for="email">이메일:</label>
                     <input type="email" class="form-control" id="email" name="email" required>
@@ -51,57 +137,13 @@
                     <input type="text" class="form-control" id="address" name="address" required>
                     <span id="error-address" class="error-message"></span>
                 </div>
-                <button type="submit" class="btn btn-primary">회원가입</button>
+                <input type="submit" class="btn btn-primary"></button>
             </form>
         </div>
 
         <!-- Import Bootstrap JS and jQuery -->
-        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-        <script>
-            document.getElementById('registerForm').addEventListener('submit', function (event) {
-                const auth_id = document.getElementById('auth_id').value;
-                const email = document.getElementById('email').value;
-                const name = document.getElementById('name').value;
-                const password = document.getElementById('password').value;
-                const password2 = document.getElementById('password2').value;
-                const phone_num = document.getElementById('phone_num').value;
-                const address = document.getElementById('address').value;
-
-                const errors = {};
-                if (!email.includes('@')) {
-                    errors.email = '올바른 이메일 형식이 아닙니다.';
-                }
-
-                if (name.length < 4) {
-                    errors.name = '이름은 최소 4자 이상이어야 합니다.';
-                }
-
-                if (password !== password2) {
-                    errors.password2 = '비밀번호가 일치하지 않습니다.';
-                }
-
-                if (Object.keys(errors).length > 0) {
-                    event.preventDefault(); // 폼 제출 막기
-                    displayErrors(errors);
-                }
-                else {
-                    res.render('index.ejs')
-                }
-            });
-
-            // 오류 메시지를 화면에 표시하는 함수
-            function displayErrors(errors) {
-                Object.keys(errors).forEach(key => {
-                    const errorSpan = document.getElementById('error-' + key);
-                    if (errorSpan) {
-                        errorSpan.innerText = errors[key];
-                    }
-                });
-            }
-        </script>
         <%- include('include/body-js.html') %>
 </body>
 
