@@ -29,4 +29,4 @@ jobs:
             sudo docker rm techit-client ;
             sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
-            docker run --name=techit-client -d -p 80:8081 --network techit-network -e PROXY_HOST=techit-server -e PROXY_PORT=8080 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
+            sudo docker run --name=techit-client -d -p 80:8081 --network techit-network -e PROXY_HOST=techit-server -e PROXY_PORT=8080 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_IMAGENAME }}
