@@ -145,20 +145,22 @@
                                 addImagePreview(`/${file}`);
 
                                 // input 태그 파일 추가
-                                const imageInput = $('#image-input');
-                                const files = imageInput.prop('files');
-                                const newFiles = new FileList([...files, new File([file], file.name, {
-                                    type: 'image/*'
-                                })], '');
-                                imageInput.prop('files', newFiles);
+                                // const imageInput = $('#image-input');
+                                // const files = imageInput.prop('files');
+                                // const newFiles = new FileList([...files, new File([file], file.name, {
+                                //     type: 'image/*'
+                                // })], '');
+                                // imageInput.prop('files', newFiles);
                             });
 
 
                         }
 
                         // 첨부 파일 (한 줄로 클릭 시 다운로드, 표시는 경로 제외하고 파일명만)
+                        console.log(data.file);
                         if (data.file) {
                             let files = data.files;
+                            console.log(files);
                             files.forEach((file) => {
                                 let fileName = file.split('/').pop();
                                 $('#files').append(`<span><a href="/${file}" download>${fileName}</a></span>`);
