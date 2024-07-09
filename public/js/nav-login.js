@@ -1,9 +1,9 @@
 document.getElementById('loginForm').addEventListener('submit', async function (event) {
     event.preventDefault();
-    const auth_id = event.target.auth_id.value;
+    const email = event.target.email.value;
     const password = event.target.password.value;
 
-    console.log('Submitting login form:', auth_id, password);
+    console.log('Submitting login form:', email, password);
 
     try {
         const response = await fetch('/api/auth/login', {
@@ -11,7 +11,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ auth_id, password })
+            body: JSON.stringify({ email, password })
         });
 
         console.log('Response received:', response);
@@ -22,7 +22,6 @@ document.getElementById('loginForm').addEventListener('submit', async function (
                 alert('로그인 성공!');
                 console.log('User data:', result.user);
                 sessionStorage.setItem('userId', result.user.id); // user_id를 sessionStorage에 저장
-                window.location.href = '/accounts';
             } else {
                 alert('로그인 실패: ' + result.message);
             }

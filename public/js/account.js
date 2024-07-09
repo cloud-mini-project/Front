@@ -26,6 +26,7 @@ $(document).ready(function () {
                                 <button class="btn btn-danger btn-sm deleteAccount" data-id="${account.id}">삭제</button>
                                 <button class="btn btn-success btn-sm deposit" data-id="${account.id}">입금</button>
                                 <button class="btn btn-warning btn-sm withdraw" data-id="${account.id}">출금</button>
+                                <button class="btn btn-info btn-sm transfer" data-id="${account.id}">송금</button>
                             </div>
                         </li>`;
                 });
@@ -37,7 +38,6 @@ $(document).ready(function () {
             alert('계좌 목록을 불러오는데 실패했습니다.');
         });
     }
-
 
     loadAccounts();
 
@@ -115,6 +115,35 @@ $(document).ready(function () {
             }
         }).fail(function () {
             alert('출금 요청에 실패했습니다.');
+        });
+    });
+
+    $(document).on('click', '.transfer', function () {
+        const accountId = $(this).data('id');
+        $('#transferForm').data('sender-account-id', accountId);
+        $('#transferModal').modal('show');
+    });
+
+    $('#transferForm').submit(function (event) {
+        event.preventDefault();
+        const senderAccountId = $(this).data('sender-account-id');
+        const recipientAccount = $('#recipientAccount').val();
+        const transferAmount = $('#transferAmount').val();
+        $.post('/api/account/transfer', {
+            sender_account_id: senderAccountId,
+            recipient_account: recipientAccount,
+            amount: transferAmount,
+            user_id: userId
+        }, function (data) {
+            if (data.success) {
+                alert('송금이 완료되었습니다.');
+                loadAccounts();
+                $('#transferModal').modal('hide');
+            } else {
+                alert('송금 실패: ' + data.error);
+            }
+        }).fail(function () {
+            alert('송금 요청에 실패했습니다.');
         });
     });
 });
