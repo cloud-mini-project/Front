@@ -29,7 +29,6 @@ app.use('/public/notice', createProxyMiddleware({
     changeOrigin: true
 }));
 
-
 app.get('/', (req, res) => {
     res.render('index');
 });
@@ -50,10 +49,11 @@ app.get(`/register`, (req, res) => {
     res.render('register');
 });
 
+app.get('/qna', (req, res) => {
+    res.render('qna');
+});
+
 app.listen(PORT, () => {
     console.log(`Server running at http://${HOST}:${PORT}`);
 });
 
-app.get('/qna', (req, res) => {
-    res.render('qna');
-});

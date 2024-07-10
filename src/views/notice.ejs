@@ -67,6 +67,7 @@
                     event.preventDefault();
 
                     var formData = new FormData(this);
+                    console.log(formData);
                     $.ajax({
                         url: '/api/notice',
                         type: 'POST',
